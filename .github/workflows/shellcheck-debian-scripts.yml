@@ -5,6 +5,9 @@ env:
 
 on:
   pull_request:
+    branches:
+      - 'ubuntu/**'
+    paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
   push:
     branches:
       - 'ubuntu/**'
