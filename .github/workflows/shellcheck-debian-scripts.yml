@@ -1,0 +1,84 @@
+name: ShellCheck Debian package scripts
+
+env:
+  GLOBS_TO_SHELLCHECK: ("**/*.postinst" "**/*.postrm" "**/*.preinst" "**/*.prerm")
+
+on:
+  pull_request:
+  push:
+    branches:
+      - 'ubuntu/**'
+    paths: ("**/*.postinst" "**/*.postrm" "**/*.preinst" "**/*.prerm")
+
+concurrency:
+  group: 'ci-${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: sh -ex {0}
+
+jobs:
+  shellcheck-on-all-matching-files:
+    name: ShellCheck on all matching files in the repo
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        run: |
+          ALL_MATCHING_SCRIPTS=$(git ls-files ${GLOBS_TO_SHELLCHECK} | tr '\n' ' ')
+          if [ -z "${ALL_MATCHING_SCRIPTS}" ]
+          then
+            echo "There are no files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
+          else
+            shellcheck ${ALL_MATCHING_SCRIPTS}
+          fi
+
+  shellcheck-on-matching-and-changed-files:
+    name: ShellCheck on matching files that have changed in this PR/push
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4
+
+      - name: Get all matching changed files
+        id: matching-changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: ${{ env.GLOBS_TO_SHELLCHECK }}
+          files_separator: " "
+
+      - name: Run shellcheck on the matching changed files
+        env:
+          MATCHING_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
+        run: |
+          MATCHING_CHANGED_FILES=$(git ls-files ${MATCHING_CHANGED_FILES} | tr '\n' ' ')
+          if [ -z "${MATCHING_CHANGED_FILES}" ]
+          then
+            echo "There are no files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
+          else
+            shellcheck ${MATCHING_CHANGED_FILES}
+          fi
+
+  differential-shellcheck:
+    name: Run Differential shellcheck
+    runs-on: ubuntu-24.04
+
+    permissions:
+      security-events: write
+
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Differential ShellCheck
+        uses: redhat-plumbers-in-action/differential-shellcheck@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          include-path: ${{ env.GLOBS_TO_SHELLCHECK }}
