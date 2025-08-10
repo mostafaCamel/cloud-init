@@ -76,8 +76,8 @@ jobs:
     name: Run Differential shellcheck
     runs-on: ubuntu-24.04
 
-    # permissions:
-    #   security-events: write
+    permissions:
+      security-events: write
 
     steps:
       - name: Repository checkout
