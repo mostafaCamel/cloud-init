@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - 'ubuntu/**'
-    paths: ("**/*.postinst" "**/*.postrm" "**/*.preinst" "**/*.prerm")
+    paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
 
 concurrency:
   group: 'ci-${{ github.workflow }}-${{ github.ref }}'
