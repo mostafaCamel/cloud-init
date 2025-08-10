@@ -1,8 +1,8 @@
 name: ShellCheck Debian package scripts
 
 env:
-  # If you change this env, please update the on.(pull_request|push).paths keys as well
-  # because these keys are hardcoded as they are unable to use the env variables.
+  # If you change this env and **if** the on.(pull_request|push).paths keys exist,
+  # then please update these keys because these keys are hardcoded as they are unable to use the env variables.
   # This is a space separated string. Do not use curly braces
   # as git ls-files do not support curly braces in globs.
   # Assumption: the resolved filepaths do not contain spaces.
@@ -68,15 +68,20 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
         run: |
-          echo "The changed and modified (including deleted) files are ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}"
-          echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
-          MATCHING_CHANGED_FILES=$(git ls-files ${ALL_CHANGED_FILES} | tr '\n' ' ')
-          echo "The matching and changed files are ${MATCHING_CHANGED_FILES}"
-          if [ -z "${MATCHING_CHANGED_FILES}" ]
+          if [ -z "${ALL_CHANGED_FILES}" ]
           then
-            echo "There are no files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
+            echo "There are no changed files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
           else
-            shellcheck ${MATCHING_CHANGED_FILES}
+            echo "The changed and modified (including deleted) files are ${ALL_CHANGED_FILES}"
+            echo "The globs used are ${GLOBS_TO_SHELLCHECK}"
+            MATCHING_CHANGED_FILES=$(git ls-files ${ALL_CHANGED_FILES} | tr '\n' ' ') #filter out deleted files
+            echo "The matching and changed files are ${MATCHING_CHANGED_FILES}"
+            if [ -z "${MATCHING_CHANGED_FILES}" ]
+            then
+              echo "There are no changed files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
+            else
+              shellcheck ${MATCHING_CHANGED_FILES}
+            fi
           fi
 
   differential-shellcheck:
