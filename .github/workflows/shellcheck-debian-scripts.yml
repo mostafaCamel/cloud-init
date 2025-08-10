@@ -33,7 +33,7 @@ concurrency:
 defaults:
   run:
     # Using bash instead of the usual sh in the other workflows in order to support the globstar **
-    shell: bash -Bex --globstar {0}
+    shell: bash --globstar -Bex {0}
 
 # Note: No need to specify the shell option in the shellcheck command.
 # These linted scripts are for ubuntu so the !/bin/sh (i.e. system shell) shebang at the top of these scripts .
