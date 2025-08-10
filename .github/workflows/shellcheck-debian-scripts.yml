@@ -1,9 +1,8 @@
 name: ShellCheck Debian package scripts
 
 env:
-  # This is a space separated string. Do not use curly braces
-  # as git ls-files do not support curly braces in globs.
-  # Assumption: the resolved filepaths do not contain spaces.
+  # This is a space separated string for multiple globs
+  # Assumption in this workflow: the resolved filepaths do not contain spaces.
   GLOBS_TO_SHELLCHECK: "**/*.{post,pre}{inst,rm}"
 
 # on.(pull_request|push).paths keys are not used because the steps in the jobs
@@ -50,10 +49,7 @@ jobs:
 
       - name: Run ShellCheck
         run: |
-          bash --version
-          shopt globstar
           shopt -s globstar
-          shopt globstar
           echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
           ALL_MATCHING_SCRIPTS=$(git ls-files ${GLOBS_TO_SHELLCHECK} | tr '\n' ' ')
           echo "The matching scripts to shellcheck are ${ALL_MATCHING_SCRIPTS}"
@@ -83,9 +79,7 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
         run: |
-          shopt globstar
           shopt -s globstar
-          shopt globstar
           if [ -z "${ALL_CHANGED_FILES}" ]
           then
             echo "There are no changed files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
