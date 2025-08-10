@@ -12,13 +12,9 @@ on:
   pull_request:
     branches:
       - 'ubuntu/**'
-    # Harcoded array based on the env.GLOBS_TO_SHELLCHECK key
-    paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
   push:
     branches:
       - 'ubuntu/**'
-     # Harcoded array based on the env.GLOBS_TO_SHELLCHECK key
-    paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
 
 concurrency:
   group: 'ci-${{ github.workflow }}-${{ github.ref }}'
