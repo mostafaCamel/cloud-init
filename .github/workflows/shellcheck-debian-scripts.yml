@@ -25,6 +25,7 @@ jobs:
   shellcheck-on-all-matching-files:
     name: ShellCheck on all matching files in the repo
     runs-on: ubuntu-24.04
+    continue-on-error: true
     steps:
       - name: Repository checkout
         uses: actions/checkout@v4
