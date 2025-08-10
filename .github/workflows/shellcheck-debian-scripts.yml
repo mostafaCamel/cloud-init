@@ -1,13 +1,16 @@
 name: ShellCheck Debian package scripts
 
 env:
-  # If you change this env and **if** the on.(pull_request|push).paths keys exist,
-  # then please update these keys because these keys are hardcoded as they are unable to use the env variables.
   # This is a space separated string. Do not use curly braces
   # as git ls-files do not support curly braces in globs.
   # Assumption: the resolved filepaths do not contain spaces.
   GLOBS_TO_SHELLCHECK: "**/*.postinst **/*.postrm **/*.preinst **/*.prerm"
 
+# on.(pull_request|push).paths keys are not used because the steps in the jobs
+# already handle filtering the file paths for specific globs.
+# Also, we need the action to always be triggered (and succeed) if we decide to have this
+# check to be blocking the PR. Otherwise (if on.(pull_request|push).paths are defined and the check is 
+# blocking the PR), the PRs which do not have changes in these specific files will be blocked
 on:
   pull_request:
     branches:
