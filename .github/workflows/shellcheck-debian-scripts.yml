@@ -1,16 +1,23 @@
 name: ShellCheck Debian package scripts
 
 env:
+  # If you change this env, please update the on.(pull_request|push).paths keys as well
+  # because these keys are hardcoded as they are unable to use the env variables.
+  # This is a space separated string. Do not use curly braces
+  # as git ls-files do not support curly braces in globs.
+  # Assumption: the resolved filepaths do not contain spaces.
   GLOBS_TO_SHELLCHECK: "**/*.postinst **/*.postrm **/*.preinst **/*.prerm"
 
 on:
   pull_request:
     branches:
       - 'ubuntu/**'
+    # Harcoded array based on the env.GLOBS_TO_SHELLCHECK key
     paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
   push:
     branches:
       - 'ubuntu/**'
+     # Harcoded array based on the env.GLOBS_TO_SHELLCHECK key
     paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
 
 concurrency:
@@ -21,6 +28,10 @@ defaults:
   run:
     shell: sh -ex {0}
 
+# Note: No need to specify the shell option in the shellcheck command.
+# These linted scripts are for ubuntu so the !/bin/sh (i.e. system shell) shebang at the top of these scripts will point to bash.
+# So no need to pass the shell option to the shellcheck command as shellcheck will read the shebang at the top of the file (system shell) so will use the
+# system shell of the runner (bash because the runner is using Ubuntu images)
 jobs:
   shellcheck-on-all-matching-files:
     name: ShellCheck on all matching files in the repo
@@ -61,7 +72,7 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
         run: |
-          echo "The changed and modified (including deleted) files in this push/PR are ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}"
+          echo "The changed and modified (including deleted) files are ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}"
           echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
           MATCHING_CHANGED_FILES=$(git ls-files ${ALL_CHANGED_FILES} | tr '\n' ' ')
           echo "The matching and changed files are ${MATCHING_CHANGED_FILES}"
