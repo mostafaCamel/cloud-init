@@ -1,7 +1,7 @@
 name: ShellCheck Debian package scripts
 
 env:
-  GLOBS_TO_SHELLCHECK: ("**/*.postinst" "**/*.postrm" "**/*.preinst" "**/*.prerm")
+  GLOBS_TO_SHELLCHECK: "**/*.postinst **/*.postrm **/*.preinst **/*.prerm"
 
 on:
   pull_request:
@@ -29,10 +29,12 @@ jobs:
 
       - name: Run ShellCheck
         run: |
+          echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
           ALL_MATCHING_SCRIPTS=$(git ls-files ${GLOBS_TO_SHELLCHECK} | tr '\n' ' ')
+          echo "The matching scripts to shellcheck are ${ALL_MATCHING_SCRIPTS}"
           if [ -z "${ALL_MATCHING_SCRIPTS}" ]
           then
-            echo "There are no files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
+            echo "There are no files in the repo which match the glob patterns so shellcheck will not run"
           else
             shellcheck ${ALL_MATCHING_SCRIPTS}
           fi
@@ -54,9 +56,12 @@ jobs:
 
       - name: Run shellcheck on the matching changed files
         env:
-          MATCHING_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
+          ALL_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
         run: |
-          MATCHING_CHANGED_FILES=$(git ls-files ${MATCHING_CHANGED_FILES} | tr '\n' ' ')
+          echo "The changed and modified (including deleted) files in this push/PR are ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}"
+          echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
+          MATCHING_CHANGED_FILES=$(git ls-files ${ALL_CHANGED_FILES} | tr '\n' ' ')
+          echo "The matching and changed files are ${MATCHING_CHANGED_FILES}"
           if [ -z "${MATCHING_CHANGED_FILES}" ]
           then
             echo "There are no files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
