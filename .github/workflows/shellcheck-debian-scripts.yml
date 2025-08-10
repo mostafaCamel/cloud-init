@@ -25,7 +25,6 @@ jobs:
   shellcheck-on-all-matching-files:
     name: ShellCheck on all matching files in the repo
     runs-on: ubuntu-24.04
-    continue-on-error: true
     steps:
       - name: Repository checkout
         uses: actions/checkout@v4
@@ -43,7 +42,7 @@ jobs:
           fi
 
   shellcheck-on-matching-and-changed-files:
-    name: ShellCheck on matching files that have changed in this PR/push
+    name: ShellCheck on matching files that have changed
     runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
