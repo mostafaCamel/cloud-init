@@ -15,6 +15,11 @@ env:
 # variables so we would need to hardcode the yaml array to match env.GLOBS_TO_SHELLCHECK at the top of the file.
 on:
   pull_request:
+    # There is a known bug in GithUb but it will most probably not affect out use case
+    # https://github.com/orgs/community/discussions/118623#discussioncomment-9087833
+    # When there are 2 PRs using the same source branch, with the base branch in one PR matching
+    # on.pull_request.branches and thee base branch in the second PR not matching this key,
+    # then the second PR will show these checks that were triggered by the first PR but not the second PR.
     branches:
       - 'ubuntu/**'
   push:
