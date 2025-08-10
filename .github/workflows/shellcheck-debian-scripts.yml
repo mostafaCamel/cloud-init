@@ -33,7 +33,7 @@ concurrency:
 defaults:
   run:
     # Using bash instead of the usual sh in the other workflows in order to support the globstar **
-    shell: bash --globstar -Bex {0}
+    shell: bash -Bex {0}
 
 # Note: No need to specify the shell option in the shellcheck command.
 # These linted scripts are for ubuntu so the !/bin/sh (i.e. system shell) shebang at the top of these scripts .
@@ -50,6 +50,10 @@ jobs:
 
       - name: Run ShellCheck
         run: |
+          bash --version
+          shopt globstar
+          shopt -s globstar
+          shopt globstar
           echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
           ALL_MATCHING_SCRIPTS=$(git ls-files ${GLOBS_TO_SHELLCHECK} | tr '\n' ' ')
           echo "The matching scripts to shellcheck are ${ALL_MATCHING_SCRIPTS}"
@@ -79,6 +83,9 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
         run: |
+          shopt globstar
+          shopt -s globstar
+          shopt globstar
           if [ -z "${ALL_CHANGED_FILES}" ]
           then
             echo "There are no changed files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
