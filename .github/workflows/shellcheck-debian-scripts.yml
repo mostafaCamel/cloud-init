@@ -10,7 +10,7 @@ on:
     paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
   push:
     branches:
-      - 'ubuntu/**'
+      - main
     paths: ["**/*.postinst","**/*.postrm","**/*.preinst","**/*.prerm"]
 
 concurrency:
