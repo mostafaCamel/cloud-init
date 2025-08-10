@@ -4,7 +4,7 @@ env:
   # This is a space separated string. Do not use curly braces
   # as git ls-files do not support curly braces in globs.
   # Assumption: the resolved filepaths do not contain spaces.
-  GLOBS_TO_SHELLCHECK: "**/*.{post,pre}{inst,rm}"
+  GLOBS_TO_SHELLCHECK: "**/*.postinst **/*.postrm **/*.preinst **/*.prerm"
 
 # on.(pull_request|push).paths keys are not used because the steps in the jobs
 # already handle filtering the file paths for specific globs.
