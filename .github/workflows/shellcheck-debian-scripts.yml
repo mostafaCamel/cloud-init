@@ -1,9 +1,9 @@
 name: ShellCheck Debian package scripts
 
 env:
-  # This is a space separated string. Do not use curly braces
-  # as git ls-files do not support curly braces in globs.
-  # Assumption: the resolved filepaths do not contain spaces.
+  # This is a space separated string for multiple globs
+  # Do not use curly braces as they will be treated as literal string in `git ls-files ${GLOBS_TO_SHELLCHECK}`
+  # Assumption in this workflow: the resolved filepaths do not contain spaces.
   GLOBS_TO_SHELLCHECK: "**/*.postinst **/*.postrm **/*.preinst **/*.prerm"
 
 # on.(pull_request|push).paths keys are not used because the steps in the jobs
@@ -32,12 +32,13 @@ concurrency:
 
 defaults:
   run:
-    shell: sh -ex {0}
+    # Using bash instead of the usual sh in the other workflows in order to support the globstar **
+    shell: bash -ex {0}
 
 # Note: No need to specify the shell option in the shellcheck command.
-# These linted scripts are for ubuntu so the !/bin/sh (i.e. system shell) shebang at the top of these scripts will point to bash.
-# So no need to pass the shell option to the shellcheck command as shellcheck will read the shebang at the top of the file (system shell) so will use the
-# system shell of the runner (bash because the runner is using Ubuntu images)
+# These linted scripts are for ubuntu so the !/bin/sh (i.e. system shell) shebang at the top of these scripts .
+# So no need to pass the shell option to the shellcheck command as shellcheck will read the shebang at the top of the file (sh) so will
+# use sh
 jobs:
   shellcheck-on-all-matching-files:
     name: ShellCheck on all matching files in the repo
@@ -49,6 +50,7 @@ jobs:
 
       - name: Run ShellCheck
         run: |
+          shopt -s globstar
           echo "The globs to check are ${GLOBS_TO_SHELLCHECK}"
           ALL_MATCHING_SCRIPTS=$(git ls-files ${GLOBS_TO_SHELLCHECK} | tr '\n' ' ')
           echo "The matching scripts to shellcheck are ${ALL_MATCHING_SCRIPTS}"
@@ -78,6 +80,7 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.matching-changed-files.outputs.all_changed_and_modified_files }}
         run: |
+          shopt -s globstar
           if [ -z "${ALL_CHANGED_FILES}" ]
           then
             echo "There are no changed files in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
