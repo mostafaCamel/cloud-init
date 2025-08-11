@@ -2,8 +2,9 @@ name: ShellCheck Debian package scripts
 
 env:
   # This is a space separated string for multiple globs
+  # Do not use curly braces as they will be treated as literal string in `git ls-files ${GLOBS_TO_SHELLCHECK}`
   # Assumption in this workflow: the resolved filepaths do not contain spaces.
-  GLOBS_TO_SHELLCHECK: "**/*.{post,pre}{inst,rm}"
+  GLOBS_TO_SHELLCHECK: "**/*.postinst **/*.postrm **/*.preinst **/*.prerm"
 
 # on.(pull_request|push).paths keys are not used because the steps in the jobs
 # already handle filtering the file paths for specific globs.
@@ -32,7 +33,7 @@ concurrency:
 defaults:
   run:
     # Using bash instead of the usual sh in the other workflows in order to support the globstar **
-    shell: bash -Bex {0}
+    shell: bash -ex {0}
 
 # Note: No need to specify the shell option in the shellcheck command.
 # These linted scripts are for ubuntu so the !/bin/sh (i.e. system shell) shebang at the top of these scripts .
