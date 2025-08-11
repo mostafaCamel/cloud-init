@@ -9,6 +9,7 @@ cross-platform cloud instance initialization. It is supported across all
 major public cloud providers, provisioning systems for private cloud
 infrastructure, and bare-metal installations.
 
+e
 Cloud instances are initialized from a disk image and instance data:
 
 - Cloud metadata
