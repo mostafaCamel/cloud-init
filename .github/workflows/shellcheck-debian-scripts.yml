@@ -54,6 +54,5 @@ jobs:
               echo "There are no changed files remaining in the repo which match the glob pattern \'${GLOBS_TO_SHELLCHECK}\' so shellcheck will not run"
             else
               shellcheck ${RETAINED_CHANGED_FILES}
-              echo 222
             fi
           fi
